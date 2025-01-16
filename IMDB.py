@@ -77,7 +77,7 @@ cur.execute("SELECT COUNT(*) FROM directors WHERE Gender == '1'")
 female_director_count = cur.fetchall()[0][0]
 print("Number of female directors in the IMDB database:", female_director_count)
 
-# 8. Find the name of the 10th first woman director
+# 7. Find the name of the 10th first woman director
 # Explanation:
 # - Query all female directors and fetch the 10th one (index 9 in zero-based indexing).
 cur.execute("SELECT Name FROM directors WHERE Gender == '1'")
@@ -87,7 +87,7 @@ if len(female_directors) >= 10:
 else:
     print("There are less than 10 female directors in the database.")
 
-# 9. What are the three most popular movies
+# 8. What are the three most popular movies
 # Explanation:
 # - Order the movies by their popularity in descending order and fetch the top 3.
 cur.execute("SELECT Title FROM movies ORDER BY Popularity DESC LIMIT 3")
@@ -96,7 +96,7 @@ print("The three most popular movies are:")
 for i, movie in enumerate(top_popular_movies, start=1):
     print(f"{i}. {movie[0]}")
 
-# 10. What are the three most bankable movies
+# 9. What are the three most bankable movies
 # Explanation:
 # - Order the movies by their budget in descending order and fetch the top 3.
 cur.execute("SELECT Title FROM movies ORDER BY Budget DESC LIMIT 3")
@@ -105,7 +105,7 @@ print("The three most bankable movies are:")
 for i, movie in enumerate(top_bankable_movies, start=1):
     print(f"{i}. {movie[0]}")
 
-# 11. What is the most awarded and average voted movie since Jan 1st, 2000
+# 10. What is the most awarded and average voted movie since Jan 1st, 2000
 # Explanation:
 # - Filter movies released after '2000-01-01' and order by vote average in descending order.
 cur.execute("SELECT Original_Title FROM movies WHERE Release_Date > '2000-01-01' ORDER BY Avg_Ratings DESC LIMIT 1")
@@ -115,7 +115,7 @@ if most_awarded_movie:
 else:
     print("No movies found meeting the criteria.")
 
-# 12. Which movies were directed by Brenda Chapman?
+# 11. Which movies were directed by Brenda Chapman?
 # Explanation:
 # - Perform a JOIN between the `movies` and `directors` tables to find movies directed by 'Brenda Chapman'.
 cur.execute("""
@@ -132,6 +132,43 @@ if brenda_chapman_movies:
 else:
     print("No movies directed by Brenda Chapman found in the database.")
 
+# 12. Name the Director who has made the most movies
+# Explanation:
+# - Use a `JOIN` between the `directors` and `movies` tables.
+# - Group by `director_id` to count the number of movies each director made.
+# - Order the results in descending order by the count and fetch the top one.
+cur.execute("""
+    SELECT Name 
+    FROM directors 
+    JOIN movies ON directors.ID = movies.Director_id 
+    GROUP BY Director_id 
+    ORDER BY COUNT(Name) DESC 
+    LIMIT 1
+""")
+most_movies_director = cur.fetchall()
+if most_movies_director:
+    print("The director who has made the most movies is:", most_movies_director[0][0])
+else:
+    print("No data found for the most prolific director.")
+
+# 13. Name the Director who is most bankable
+# Explanation:
+# - Use a `JOIN` between the `directors` and `movies` tables.
+# - Group by `director_id` to calculate the sum of budgets for each director.
+# - Order the results in descending order by the total budget and fetch the top one.
+cur.execute("""
+    SELECT Name 
+    FROM directors 
+    JOIN movies ON directors.ID = movies.Director_id 
+    GROUP BY Director_id 
+    ORDER BY SUM(Budget) DESC 
+    LIMIT 1
+""")
+most_bankable_director = cur.fetchall()
+if most_bankable_director:
+    print("The most bankable director is:", most_bankable_director[0][0])
+else:
+    print("No data found for the most bankable director.")
+
 # Close the database connection to release resources
 conn.close()
-
