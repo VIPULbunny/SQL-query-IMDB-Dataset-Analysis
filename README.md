@@ -1,5 +1,3 @@
-# Code to create a README.md file for the project
-readme_content = """
 # Movie Analytics Using SQLite and Python
 
 ---
